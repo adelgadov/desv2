@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Conversor DES</title>
     <script src="jquery.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <style>
         html, body {
             width: 100%;
@@ -17,14 +16,16 @@
     <tr>
         <td>Texto:</td>
         <td><input type="text" id="texto" maxlength="16"></td>
+        <td><input type="button"  value="Limpiar" onclick="limpiar('texto')"></td>
     </tr>
     <tr>
         <td>Password:</td>
         <td><input type="text" id="password" maxlength="16"></td>
+        <td><input type="button"  value="Limpiar" onclick="limpiar('password')"></td>
     </tr>
     <tr>
         <td>Cifrado:</td>
-        <td>3DES<input type="radio" value="3DES" name="cifrado" >DES<input type="radio" value="DES" name="cifrado" checked="checked"></td>
+        <td>3DES<input type="radio" value="3DES" name="cifrado" >DES<input type="radio" value="DES" name="cifrado" checked="checked" id="des"></td>
     </tr>
     <tr>
         <td colspan="2"><input type="button" value="Enviar" onclick="enviar()"></td>
@@ -44,18 +45,20 @@
 </div>
 <script>
     function enviar() {
-        var ciph=$('input[name=cifrado]:checked').val();
-
-        if(ciph=="3DES") {
-            alert("Esta opción está deshabilitada para su usuario, para activarla deberá abonar más puntos.");
-            return 0;
-        }
-
-
         $.post("conversor.php",{texto: $("#texto").val(), password:$("#password").val()}, function (result){
             $("#resultado").html(result);
         });
 
+        $.strPad = function(i,l,s) {
+            var o = i.toString();
+            if (!s) { s = '0'; }
+            while (o.length < l) {
+                o = s + o;
+            }
+            return o;
+        };
+        $("#texto").val($.strPad($("#texto").val(), 16));
+        $("#password").val($.strPad($("#password").val(), 16));
     }
 
     $('#texto').keypress(function (event) {
@@ -63,6 +66,11 @@
     });
     $('#password').keypress(function (event) {
         return isNumber(event, this)
+    });
+
+    $('input[type=radio][name=cifrado]').change(function() {
+        alert("Esta opción está deshabilitada para su usuario, para activarla deberá abonar más puntos.");
+        $('#des').prop('checked', true);
     });
     function isNumber(evt, element) {
 
@@ -72,6 +80,10 @@
             return false;
 
         return true;
+    }
+
+    function limpiar(input) {
+        $("#"+input).val("");
     }
 </script>
 </body>
